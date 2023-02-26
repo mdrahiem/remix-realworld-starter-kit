@@ -1,6 +1,23 @@
+import type { LoaderArgs } from "@remix-run/node";
+import { json } from "@remix-run/node";
+import { Link, useLoaderData } from "@remix-run/react";
 import Banner from "~/components/common/banner";
+import { articleListSchema, tagsSchema } from "~/schemas/articlelist.schema";
 
+export async function loader({ request }: LoaderArgs) {
+  const response = await fetch(`${process.env.PUBLIC_API_BASE_URL}/articles`);
+  const jsonResonse = await response.json();
+  const articlesResponse = articleListSchema.parse(jsonResonse);
+  const tagsResponse = await fetch(`${process.env.PUBLIC_API_BASE_URL}/tags`);
+  const tagsJsonResonse = await tagsResponse.json();
+  const tags = tagsSchema.parse(tagsJsonResonse);
+  return json({ articles: articlesResponse.articles, tags: tags.tags });
+}
+
+// TODO: Move these to components
 export default function Index() {
+  const { articles, tags } = useLoaderData<typeof loader>();
+  console.log(articles);
   return (
     <div className="home-page">
       <Banner />
@@ -27,56 +44,58 @@ export default function Index() {
               </ul>
             </div>
 
-            <div className="article-preview">
-              <div className="article-meta">
-                <a href="profile.html">
-                  <img src="http://i.imgur.com/Qr71crq.jpg" alt="" />
-                </a>
-                <div className="info">
-                  <a href="/eric-simons" className="author">
-                    Eric Simons
-                  </a>
-                  <span className="date">January 20th</span>
+            {articles.map((article) => (
+              <div className="article-preview" key={article.slug}>
+                <div className="article-meta">
+                  <Link to={`/author/${article.author.username}`}>
+                    <img src={article.author.image} alt="" />
+                  </Link>
+                  <div className="info">
+                    <Link
+                      to={`/author/${article.author.username}`}
+                      className="author"
+                    >
+                      {article.author.username}
+                    </Link>
+                    <span className="date">{article.updatedAt}</span>
+                  </div>
+                  <button className="btn btn-outline-primary btn-sm pull-xs-right">
+                    <i className="ion-heart"></i> {article.favoritesCount}
+                  </button>
                 </div>
-                <button className="btn btn-outline-primary btn-sm pull-xs-right">
-                  <i className="ion-heart"></i> 29
-                </button>
+                <Link to={`/${article.slug}`} className="preview-link">
+                  <h1>{article.title}</h1>
+                  <p>{article.description}</p>
+                  <span>Read more...</span>
+                  {article.tagList.length > 0 && (
+                    <ul className="tag-list">
+                      {article.tagList.map((tag) => (
+                        <li
+                          className="tag-default tag-pill tag-outline"
+                          key={tag}
+                        >
+                          {tag}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </Link>
               </div>
-              <a href="/" className="preview-link">
-                <h1>How to build webapps that scale</h1>
-                <p>This is the description for the post.</p>
-                <span>Read more...</span>
-              </a>
-            </div>
+            ))}
           </div>
           <div className="col-md-3">
             <div className="sidebar">
               <p>Popular Tags</p>
               <div className="tag-list">
-                <a href="/" className="tag-pill tag-default">
-                  programming
-                </a>
-                <a href="/" className="tag-pill tag-default">
-                  javascript
-                </a>
-                <a href="/" className="tag-pill tag-default">
-                  emberjs
-                </a>
-                <a href="/" className="tag-pill tag-default">
-                  angularjs
-                </a>
-                <a href="/" className="tag-pill tag-default">
-                  react
-                </a>
-                <a href="/" className="tag-pill tag-default">
-                  mean
-                </a>
-                <a href="/" className="tag-pill tag-default">
-                  node
-                </a>
-                <a href="/" className="tag-pill tag-default">
-                  rails
-                </a>
+                {tags.map((tag) => (
+                  <Link
+                    to={`/tag/${tag}`}
+                    className="tag-pill tag-default"
+                    key={tag}
+                  >
+                    {tag}
+                  </Link>
+                ))}
               </div>
             </div>
           </div>
