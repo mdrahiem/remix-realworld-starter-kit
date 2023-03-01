@@ -1,6 +1,6 @@
 #### Phase I (Frontend)
 
-- [ ] Add styles
+- [x] Add styles
 - [ ] Add non-authenticated routes
 - [ ] Add components
 - [ ] Add authentication
