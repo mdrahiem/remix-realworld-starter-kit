@@ -1,6 +1,7 @@
 import type { LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
+import HTMLReactParser from "html-react-parser";
 import { articleSingleSchema } from "~/schemas/articles.schema";
 
 export async function loader({ params }: LoaderArgs) {
@@ -18,7 +19,6 @@ export async function loader({ params }: LoaderArgs) {
 
 export default function ArticleSingle() {
   const { article } = useLoaderData<typeof loader>();
-  console.log("articlearticle", article);
   return (
     <div className="article-page">
       <div className="banner">
@@ -36,7 +36,13 @@ export default function ArticleSingle() {
               >
                 {article.author.username}
               </Link>
-              <span className="date">{article.updatedAt}</span>
+              <span className="date">
+                {new Date(article.updatedAt).toLocaleString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </span>
             </div>
             <button className="btn btn-sm btn-outline-secondary">
               <i className="ion-plus-round"></i>
@@ -57,12 +63,15 @@ export default function ArticleSingle() {
       <div className="container page">
         <div className="row article-content">
           <div className="col-md-12">
-            <p>
-              Web development technologies have evolved at an incredible clip
-              over the past few years.
-            </p>
-            <h2 id="introducing-ionic">Introducing RealWorld.</h2>
-            <p>It's a great solution for learning how other frameworks work.</p>
+            <p>{HTMLReactParser(article.body)}</p>
+
+            <ul className="tag-list">
+              {article.tagList.map((tag) => (
+                <li className="tag-default tag-pill tag-outline" key={tag}>
+                  {tag}
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
 
@@ -70,23 +79,35 @@ export default function ArticleSingle() {
 
         <div className="article-actions">
           <div className="article-meta">
-            <a href="profile.html">
-              <img src="http://i.imgur.com/Qr71crq.jpg" />
-            </a>
+            <Link to={`/author/${article.author.username}`}>
+              <img src={article.author.image} alt="" />
+            </Link>
             <div className="info">
-              <a href="" className="author">
-                Eric Simons
-              </a>
-              <span className="date">January 20th</span>
+              <Link
+                to={`/author/${article.author.username}`}
+                className="author"
+              >
+                {article.author.username}
+              </Link>
+              <span className="date">
+                {new Date(article.updatedAt).toLocaleString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </span>
             </div>
             <button className="btn btn-sm btn-outline-secondary">
               <i className="ion-plus-round"></i>
-              &nbsp; Follow Eric Simons
+              &nbsp; Follow {article.author.username}{" "}
+              {/* // TODO check if there are followers 
+               <span className="counter">({article.author.})</span> */}
             </button>
-            &nbsp;
+            &nbsp;&nbsp;
             <button className="btn btn-sm btn-outline-primary">
               <i className="ion-heart"></i>
-              &nbsp; Favorite Post <span className="counter">(29)</span>
+              &nbsp; Favorite Post{" "}
+              <span className="counter">({article.favoritesCount})</span>
             </button>
           </div>
         </div>
@@ -105,6 +126,7 @@ export default function ArticleSingle() {
                 <img
                   src="http://i.imgur.com/Qr71crq.jpg"
                   className="comment-author-img"
+                  alt=""
                 />
                 <button className="btn btn-sm btn-primary">Post Comment</button>
               </div>
@@ -122,10 +144,11 @@ export default function ArticleSingle() {
                   <img
                     src="http://i.imgur.com/Qr71crq.jpg"
                     className="comment-author-img"
+                    alt=""
                   />
                 </a>
                 &nbsp;
-                <a href="" className="comment-author">
+                <a href="/" className="comment-author">
                   Jacob Schmidt
                 </a>
                 <span className="date-posted">Dec 29th</span>

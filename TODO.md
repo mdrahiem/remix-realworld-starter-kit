@@ -6,6 +6,11 @@
 - [ ] Add authentication
 - [ ] Add SEO
 
+###### Article single page:
+
+- [ ] Follow click functionality
+- [ ] comments section
+
 #### Phase II (Fullstack)
 
 - [ ] Implement the backend with Supabase
