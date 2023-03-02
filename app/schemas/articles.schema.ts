@@ -46,3 +46,22 @@ export const articleSingleSchema = z.object({
     })
   })
 })
+
+
+export const commentsSchema = z.object({
+  comments: z.array(
+    z.object({
+      id: z.number(),
+      createdAt: z.string(),
+      updatedAt: z.string(),
+      body: z.string(),
+      author: z.object({
+        username: z.string(),
+        bio: z.null(),
+        image: z.string(),
+        following: z.boolean()
+      })
+    })
+  )
+}).optional()
+

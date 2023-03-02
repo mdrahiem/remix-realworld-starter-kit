@@ -1,16 +1,23 @@
-#### Phase I (Frontend)
+### Phase I (Frontend)
 
 - [x] Add styles
-- [ ] Add non-authenticated routes
+- [x] Add non-authenticated routes
 - [ ] Add components
 - [ ] Add authentication
 - [ ] Add SEO
+
+###### Article list page:
+
+- [ ] Pagination
+- [ ] Your feed section
+- [ ] tag specific feed section
+- [ ] article like button
 
 ###### Article single page:
 
 - [ ] Follow click functionality
 - [ ] comments section
 
-#### Phase II (Fullstack)
+### Phase II (Fullstack)
 
 - [ ] Implement the backend with Supabase

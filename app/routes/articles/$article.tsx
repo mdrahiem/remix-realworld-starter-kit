@@ -2,7 +2,7 @@ import type { LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import HTMLReactParser from "html-react-parser";
-import { articleSingleSchema } from "~/schemas/articles.schema";
+import { articleSingleSchema, commentsSchema } from "~/schemas/articles.schema";
 
 export async function loader({ params }: LoaderArgs) {
   const articleSlug = params.article;
@@ -14,11 +14,20 @@ export async function loader({ params }: LoaderArgs) {
   );
   const jsonResonse = await response.json();
   const articleResponse = articleSingleSchema.parse(jsonResonse);
-  return json({ article: articleResponse.article });
+  const commentsResponse = await fetch(
+    `${process.env.PUBLIC_API_BASE_URL}/articles/${articleSlug}/comments`
+  );
+  const commentsJsonResonse = await commentsResponse.json();
+  console.log("commentsJsonResonsecommentsJsonResonse", commentsJsonResonse);
+  const comments = commentsSchema.parse(commentsJsonResonse);
+  return json({
+    article: articleResponse.article,
+    comments: comments?.comments ?? [],
+  });
 }
 
 export default function ArticleSingle() {
-  const { article } = useLoaderData<typeof loader>();
+  const { article, comments } = useLoaderData<typeof loader>();
   return (
     <div className="article-page">
       <div className="banner">
@@ -114,6 +123,11 @@ export default function ArticleSingle() {
 
         <div className="row">
           <div className="col-xs-12 col-md-8 offset-md-2">
+            <p>
+              <a href="/login">Sign in</a> or <a href="/register">sign up</a> to
+              add comments on this article.
+            </p>
+            {/* Post comment form */}
             <form className="card comment-form">
               <div className="card-block">
                 <textarea
@@ -132,54 +146,37 @@ export default function ArticleSingle() {
               </div>
             </form>
 
-            <div className="card">
-              <div className="card-block">
-                <p className="card-text">
-                  With supporting text below as a natural lead-in to additional
-                  content.
-                </p>
+            {/* Comment single */}
+            {comments.map((comment) => (
+              <div className="card" key={comment.id}>
+                <div className="card-block">
+                  <p className="card-text">{HTMLReactParser(comment.body)}</p>
+                </div>
+                <div className="card-footer">
+                  <a
+                    href={`/author/${comment.author.username}`}
+                    className="comment-author"
+                  >
+                    <img
+                      src={comment.author.image}
+                      className="comment-author-img"
+                      alt={comment.author.username}
+                    />
+                  </a>
+                  &nbsp;
+                  <a href="/" className="comment-author">
+                    {comment.author.username}
+                  </a>
+                  <span className="date-posted">
+                    {new Date(comment.updatedAt).toLocaleString("en-US", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                  </span>
+                </div>
               </div>
-              <div className="card-footer">
-                <a href="" className="comment-author">
-                  <img
-                    src="http://i.imgur.com/Qr71crq.jpg"
-                    className="comment-author-img"
-                    alt=""
-                  />
-                </a>
-                &nbsp;
-                <a href="/" className="comment-author">
-                  Jacob Schmidt
-                </a>
-                <span className="date-posted">Dec 29th</span>
-              </div>
-            </div>
-
-            <div className="card">
-              <div className="card-block">
-                <p className="card-text">
-                  With supporting text below as a natural lead-in to additional
-                  content.
-                </p>
-              </div>
-              <div className="card-footer">
-                <a href="" className="comment-author">
-                  <img
-                    src="http://i.imgur.com/Qr71crq.jpg"
-                    className="comment-author-img"
-                  />
-                </a>
-                &nbsp;
-                <a href="" className="comment-author">
-                  Jacob Schmidt
-                </a>
-                <span className="date-posted">Dec 29th</span>
-                <span className="mod-options">
-                  <i className="ion-edit"></i>
-                  <i className="ion-trash-a"></i>
-                </span>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </div>
