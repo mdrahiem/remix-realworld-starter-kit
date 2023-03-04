@@ -18,7 +18,6 @@ export async function loader({ params }: LoaderArgs) {
     `${process.env.PUBLIC_API_BASE_URL}/articles/${articleSlug}/comments`
   );
   const commentsJsonResonse = await commentsResponse.json();
-  console.log("commentsJsonResonsecommentsJsonResonse", commentsJsonResonse);
   const comments = commentsSchema.parse(commentsJsonResonse);
   return json({
     article: articleResponse.article,

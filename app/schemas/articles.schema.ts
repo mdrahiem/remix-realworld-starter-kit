@@ -14,7 +14,7 @@ export const articleListSchema = z.object({
       favoritesCount: z.number(),
       author: z.object({
         username: z.string(),
-        bio: z.null(),
+        bio: z.string().nullable(),
         image: z.string(),
         following: z.boolean()
       })

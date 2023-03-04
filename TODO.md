@@ -5,6 +5,7 @@
 - [ ] Add components
 - [ ] Add authentication
 - [ ] Add SEO
+- [ ] Add error and catch boundaries
 
 ###### Article list page:
 
