@@ -5,6 +5,7 @@ import Layout from "~/components/common/layout";
 import { articleListSchema, tagsSchema } from "~/schemas/articles.schema";
 
 export async function loader({ request }: LoaderArgs) {
+  // TODO: Move all fetch requests to server functions to reuse
   const response = await fetch(`${process.env.PUBLIC_API_BASE_URL}/articles`);
   const jsonResonse = await response.json();
   const articlesResponse = articleListSchema.parse(jsonResonse);
@@ -20,6 +21,7 @@ export default function Articles() {
   return (
     <Layout tags={tags}>
       <>
+        {/* // TODO: Make a component */}
         {articles.map((article) => (
           <div className="article-preview" key={article.slug}>
             <div className="article-meta">
