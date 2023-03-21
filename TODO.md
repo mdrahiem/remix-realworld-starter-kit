@@ -19,6 +19,10 @@
 - [ ] Follow click functionality
 - [ ] comments section
 
+###### Authentication
+
+- [ ] Need remix-auth or auth.js?
+
 ### Phase II (Fullstack)
 
 - [ ] Implement the backend with Supabase

@@ -1,4 +1,8 @@
+import { useMatches } from "@remix-run/react";
+
 export default function Navbar() {
+  const matches = useMatches();
+
   return (
     <nav className="navbar navbar-light">
       <div className="container">
@@ -7,7 +11,9 @@ export default function Navbar() {
         </a>
         <ul className="nav navbar-nav pull-xs-right">
           <li className="nav-item">
-            <a href="/">Home</a>
+            <a href="/" className="nav-link ">
+              Home
+            </a>
           </li>
           {/* <li className="nav-item">
             <a href="/editor/new">
@@ -29,10 +35,29 @@ export default function Navbar() {
             </a>
           </li> */}
           <li className="nav-item">
-            <a href="/login">Sign in</a>
+            <a
+              href="/login"
+              className={
+                matches.some((p) => p.pathname.includes("/login"))
+                  ? "nav-link active"
+                  : "nav-link"
+              }
+            >
+              {" "}
+              Sign in
+            </a>
           </li>
           <li className="nav-item">
-            <a href="/register">Sign up</a>
+            <a
+              href="/register"
+              className={
+                matches.some((p) => p.pathname.includes("/register"))
+                  ? "nav-link active"
+                  : "nav-link"
+              }
+            >
+              Sign up
+            </a>
           </li>
         </ul>
       </div>
