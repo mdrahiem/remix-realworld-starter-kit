@@ -3,6 +3,7 @@ export function validateEmail(email: unknown): email is string {
 }
 
 export function validatePassword(password: unknown): password is string {
-  const regex = /^(?=.*[a-z])(?=.*\d)(?=.*[#$@!%&*?])[A-Za-z\d#$@!%&*?]{4,30}$/
-  return typeof password === "string" && password.length > 3 && regex.test(password);
+  const regex = /^(?=.*[a-z])(?=.*\d){4,30}$/
+  // return typeof password === "string" && password.length > 3 && regex.test(password);
+  return typeof password === "string" && password.length > 3;
 }

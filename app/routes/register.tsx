@@ -1,12 +1,12 @@
 import type { DataFunctionArgs } from "@remix-run/node";
+import { redirect } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Form, useActionData } from "@remix-run/react";
+import { signupSchema } from "~/schemas/signup.schema";
 import { validatePassword } from "~/utils";
 
 type SignupErrors = {
-  email?: string;
-  username?: string;
-  password?: string;
+  message?: string | null;
 };
 
 export async function action({ request }: DataFunctionArgs) {
@@ -15,24 +15,44 @@ export async function action({ request }: DataFunctionArgs) {
   const username = formData.get("username");
   const password = formData.get("password");
   const errors: SignupErrors = {};
-  if (!email) {
-    errors.email = "email can't be blank";
-  }
   if (!username) {
-    errors.username = "username can't be blank";
-  }
-  if (!password) {
-    errors.password =
-      "password must contain one small case letter, one number, minimum of 4 characters and maximum of 30 characters";
-  }
-  if (!password || !validatePassword(password)) {
-    console.log("faillllll");
+    errors.message = "username can't be blank";
     return json({ errors }, { status: 400 });
+  } else if (!email) {
+    errors.message = "email can't be blank";
+    return json({ errors }, { status: 400 });
+  } else if (!password || !validatePassword(password)) {
+    errors.message =
+      "password must contain one small case letter, one number, minimum of 4 characters and maximum of 30 characters";
+    return json({ errors }, { status: 400 });
+  } else {
+    errors.message = null;
   }
-  console.log("ssssuuucccc");
+  console.log("bodydddddd", username, email, password);
+  const signupResponse = await fetch(
+    `${process.env.PUBLIC_API_BASE_URL}/users`,
+    {
+      method: "POST",
+      body: JSON.stringify({
+        user: {
+          username,
+          email,
+          password,
+        },
+      }),
+      headers: { "Content-Type": "application/json" },
+    }
+  );
+  const signupJsonResponse = await signupResponse.json();
+  const parsedSignupResponse = await signupSchema.parse(signupJsonResponse);
+  if (parsedSignupResponse?.user) {
+    return redirect("/");
+  }
+  console.log("ssssuuucccc", signupJsonResponse);
   return json({
     formData,
     errors,
+    parsedSignupResponse,
   });
 }
 
@@ -50,9 +70,7 @@ export default function Register() {
 
             {actionData?.errors && (
               <ul className="error-messages">
-                <li>{actionData?.errors?.username}</li>
-                <li>{actionData?.errors?.email}</li>
-                <li>{actionData?.errors?.password}</li>
+                <li>{actionData?.errors?.message}</li>
               </ul>
             )}
 
