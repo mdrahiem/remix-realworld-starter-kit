@@ -7,8 +7,8 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
-import Navbar from "~/components/common/navbar";
 import Footer from "~/components/common/footer";
+import Navbar from "~/components/common/navbar";
 
 export const meta: MetaFunction = () => ({
   charset: "utf-8",
@@ -53,6 +53,20 @@ export default function App() {
         <Scripts />
         <LiveReload />
       </body>
+    </html>
+  );
+}
+
+export function ErrorBoundary({ error }: { error: Error }) {
+  console.error(error);
+
+  return (
+    <html lang="en">
+      <head>
+        <title>Uh-oh!</title>
+      </head>
+      <h1>App Error</h1>
+      <pre>{error.message}</pre>
     </html>
   );
 }
